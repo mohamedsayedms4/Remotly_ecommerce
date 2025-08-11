@@ -2,6 +2,7 @@ package org.example.remotly_ecommerce.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,8 @@ import java.util.Set;
  * @author Mohamed Sayed
  * @since 2025-07-27
  */
+
+@Data
 @Entity
 @Setter
 @Getter
@@ -29,50 +32,27 @@ import java.util.Set;
 @Table(name = "users")
 public class User {
 
-    /**
-     * The unique identifier for the user.
-     */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /**
-     * The user's password. This field is write-only during serialization.
-     */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
-    /**
-     * The user's email address.
-     */
     private String email;
-
-    /**
-     * The full name of the user.
-     */
     private String fullName;
-
-    /**
-     * The user's phone number.
-     */
     private String phoneNumber;
 
-    /**
-     * The role of the user (e.g., CUSTOMER, ADMIN, etc.).
-     */
-    @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.ROLE_CUSTOMER;
-
-    /**
-     * A set of addresses associated with the user.
-     */
-    @OneToMany
-    private Set<Address> addresses = new HashSet<>();
-
-    /**
-     * A set of coupons the user has used. This field is ignored during serialization.
-     */
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Set<Authority> authorities = new HashSet<>();
     @ManyToMany
+    @JoinTable(
+            name = "user_coupons",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "coupon_id")
+    )
     @JsonIgnore
     private Set<Coupon> usedCoupons = new HashSet<>();
+
 }

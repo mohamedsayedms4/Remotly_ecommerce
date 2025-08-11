@@ -30,5 +30,5 @@ public class LoginRequest {
     /**
      * The one-time password sent to the user's email for verification.
      */
-    private String otp;
+    private String password;
 }

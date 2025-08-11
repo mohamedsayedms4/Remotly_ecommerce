@@ -36,5 +36,8 @@ public class SignUpRequest {
     /**
      * The one-time password sent to the user's email for sign-up verification.
      */
-    private String otp;
+    private String password;
+
+
+    private String phoneNumber;
 }

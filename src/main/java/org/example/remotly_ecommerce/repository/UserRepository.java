@@ -4,6 +4,8 @@ import org.example.remotly_ecommerce.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Repository interface for {@link User} entity.
  * Extends {@link JpaRepository} to provide CRUD operations and custom query methods for users.
@@ -25,5 +27,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param email the email of the user to search for
      * @return the User object if found, or null if not found
      */
-    User findByEmail(String email);
+    Optional<User> findByEmail(String email);
 }
