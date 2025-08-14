@@ -21,15 +21,13 @@ import java.util.Set;
  * @author Mohamed Sayed
  * @since 2025-07-27
  */
-
 @Data
 @Entity
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class User {
 
     @Id
@@ -43,9 +41,10 @@ public class User {
     private String fullName;
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private Set<Authority> authorities = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "user_coupons",
@@ -55,4 +54,11 @@ public class User {
     @JsonIgnore
     private Set<Coupon> usedCoupons = new HashSet<>();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    private Address pickupAddress = new Address();
+
+    // هذا الحقل الجديد للعلاقة مع Cart:
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private Cart cart;
 }

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.remotly_ecommerce.constants.ApplicationConstants;
 import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,7 +34,6 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
         if (jwt != null) {
             try {
-                // إزالة "Bearer " من بداية الـ token إذا كان موجود
                 if (jwt.startsWith("Bearer ")) {
                     jwt = jwt.substring(7);
                 }
@@ -57,10 +57,8 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
                         .parseSignedClaims(jwt)
                         .getPayload();
 
-                // استخدام subject بدلاً من username claim للتوافق مع UserService
                 String email = claims.getSubject();
                 if (email == null) {
-                    // fallback للـ username claim إذا ما في subject
                     email = String.valueOf(claims.get("username"));
                 }
 
@@ -79,7 +77,6 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
                             })
                             .collect(Collectors.toList());
                 } else {
-                    // إذا ما في صلاحيات، استخدم ROLE_USER الافتراضية
                     grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
                 }
 
@@ -87,9 +84,7 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
             } catch (Exception e) {
-                System.out.println("JWT Validation Error: " + e.getMessage());
-                // لا ترمي exception، فقط اتجاهل الـ token الخاطئ
-                // throw new BadCredentialsException("Invalid JWT token", e);
+                 throw new BadCredentialsException("Invalid JWT token", e);
             }
         }
 

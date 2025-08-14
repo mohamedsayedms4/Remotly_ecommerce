@@ -15,77 +15,30 @@ import org.example.remotly_ecommerce.domain.UserRole;
  * @since 2025-07-27
  */
 @Entity
-@Setter
-@Getter
+@Table(name = "sellers")
+@EqualsAndHashCode(callSuper = true)
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@EqualsAndHashCode
-public class Seller {
+public class Seller extends User {
 
-    /**
-     * Unique identifier for the seller.
-     */
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    /**
-     * Name of the seller.
-     */
     private String sellerName;
 
-    /**
-     * Phone number of the seller.
-     */
-    private String phoneNumber;
-
-    /**
-     * Email address of the seller (must be unique and not null).
-     */
-    @Column(unique = true, nullable = false)
-    private String email;
-
-    /**
-     * Encrypted password of the seller.
-     */
-    private String password;
-
-    /**
-     * Embedded business details for the seller (e.g., company name, type, etc.).
-     */
     @Embedded
     private BusinessDetails businessDetails = new BusinessDetails();
 
-    /**
-     * Embedded bank details for the seller (e.g., account number, IFSC, etc.).
-     */
     @Embedded
     private BankDetails bankDetails = new BankDetails();
 
-    /**
-     * Address used for product pickup.
-     */
-    @OneToOne
-    private Address pickupAddress = new Address();
-
-    /**
-     * Goods and Services Tax Identification Number (GSTIN) of the seller.
-     */
     private String GSTIN;
 
-    /**
-     * Role of the user (default is ROLE_SELLER).
-     */
-    private UserRole role = UserRole.ROLE_SELLER;
-
-    /**
-     * Whether the seller's email is verified.
-     */
     private Boolean isEmailVerified = false;
 
-    /**
-     * Current account status of the seller (e.g., PENDING_VERIFICATION).
-     */
-    private AccountStatus accountStatus = AccountStatus.PENDING_VERIFICATION;
-}
 
+    @Enumerated(EnumType.STRING)
+    private AccountStatus accountStatus ;
+
+    // في حالة أن الهاتف خاص بالـ Seller فقط
+    private String sellerPhoneNumber;
+    // ممكن تحذفه من User وتضعه هنا، أو تعيد استخدام الهاتف من User
+}

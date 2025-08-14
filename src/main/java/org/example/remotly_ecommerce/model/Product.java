@@ -45,12 +45,12 @@ public class Product {
     /**
      * Maximum Retail Price (MRP) of the product.
      */
-    private Integer mrpPrice;
+    private Double mrpPrice;
 
     /**
      * Current selling price of the product after applying discount.
      */
-    private Integer sellingPrice;
+    private Double sellingPrice;
 
     /**
      * Discount percentage applied to the product.
@@ -106,4 +106,7 @@ public class Product {
      */
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
+
+    private String size;
+
 }

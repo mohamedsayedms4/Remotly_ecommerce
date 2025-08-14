@@ -1,8 +1,15 @@
 package org.example.remotly_ecommerce.repository;
 
 
+import org.example.remotly_ecommerce.domain.AccountStatus;
+import org.example.remotly_ecommerce.dto.SellerDto;
+import org.example.remotly_ecommerce.model.BusinessDetails;
 import org.example.remotly_ecommerce.model.Seller;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for {@link Seller} entity.
@@ -16,6 +23,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Mohamed Sayed
  * @since 2025-07-27
  */
+@Repository
 public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     /**
@@ -24,5 +32,8 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
      * @param email the email of the seller to search for
      * @return the Seller object if found, or null if not found
      */
-    Seller findByEmail(String email);
+    Optional<Seller> findByEmail(String email);
+    List<Seller> findByAccountStatus(AccountStatus status);
+    List<Seller> findByBusinessDetails_BusinessNameContainingIgnoreCase(String partialName);
+
 }

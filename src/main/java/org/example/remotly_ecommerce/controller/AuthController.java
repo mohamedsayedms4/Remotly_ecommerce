@@ -26,7 +26,7 @@ public class AuthController {
         AuthResponse authResponse = new AuthResponse();
         authResponse.setJwt(jwt);
         authResponse.setMessage("User created successfully");
-        authResponse.setUserRole(UserRole.ROLE_ADMIN);
+        authResponse.setUserRole(UserRole.ROLE_CUSTOMER);
 
         return ResponseEntity.ok(authResponse);
     }

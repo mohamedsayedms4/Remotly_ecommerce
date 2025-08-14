@@ -42,9 +42,9 @@ public class JwtTokenGeneratorFilter extends OncePerRequestFilter {
             SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
 
             String jwt = Jwts.builder()
-                    .issuer("Remotly Ecommerce")
-                    .subject(authentication.getName()) // استخدام subject بدلاً من claim للتوافق مع UserService
-                    .claim("username", authentication.getName()) // الاحتفاظ بـ username claim للتوافق الخلفي
+                    .issuer("Masala")
+                    .subject(authentication.getName())
+                    .claim("username", authentication.getName())
                     .claim("authorities", authentication.getAuthorities().stream()
                             .map(GrantedAuthority::getAuthority)
                             .collect(Collectors.joining(",")))

@@ -25,9 +25,8 @@ public class RemotlyUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        // تحويل Authorities من Enum ل GrantedAuthority
         List<GrantedAuthority> authorities = user.getAuthorities().stream()
-                .filter(auth -> auth.getRole() != null) // التأكد إن الدور مش null
+                .filter(auth -> auth.getRole() != null)
                 .map(auth -> {
                     String name = auth.getRole().name(); // Enum → String
                     if (!name.startsWith("ROLE_")) {

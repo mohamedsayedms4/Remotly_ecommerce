@@ -23,10 +23,9 @@ public class EmailService {
             helper.setSubject(subject);
             helper.setTo(email);
 
-            // تكوين نص الرسالة مع رمز التحقق (OTP)
             String content = body + "\nYour verification code is: " + otp;
 
-            helper.setText(content, false); // false تعني نص عادي وليس HTML
+            helper.setText(content, false);
 
             mailSender.send(mimeMessage);
         } catch (MailException e) {

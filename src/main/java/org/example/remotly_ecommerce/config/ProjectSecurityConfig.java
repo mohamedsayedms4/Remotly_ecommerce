@@ -9,7 +9,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -31,6 +33,8 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * It configures the HTTP security rules, creates an in-memory user, and sets up password encoding.
  */
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class ProjectSecurityConfig {
 
 
@@ -83,10 +87,11 @@ public class ProjectSecurityConfig {
                 .requiresChannel(rcc -> rcc.anyRequest().requiresInsecure())
                 .authorizeHttpRequests(requests -> requests
 
-                        .requestMatchers("/users/profile/**").hasRole("ADMIN")
-                        .requestMatchers("/api/**","/myAccount","/users/profile").authenticated()
+//                        .requestMatchers("/sellers/profile").hasRole("ADMIN")
+                        .requestMatchers("/sellers/signup","sellers/login","/sellers/search","/products/seller/**").permitAll()
+                        .requestMatchers("/api/**","/myAccount","/sellers/**","products/insert").authenticated()
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/loginWithOtp", "/auth/verifyOtp").permitAll()
-                        .requestMatchers("/api/products/*/reviews").permitAll()
+
         );
         // Disable default Spring Security form login page
         http.formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer.disable());
