@@ -55,7 +55,7 @@ public class CartItem {
     /**
      * Selling price of the product (after discounts).
      */
-    private Integer sellingPrice;
+    private Double sellingPrice;
 
     /**
      * ID of the user who added this item to the cart.

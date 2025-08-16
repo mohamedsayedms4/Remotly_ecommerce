@@ -40,7 +40,7 @@ public class Cart {
 
     private Double totalSellingPrice;
     private Integer quantity;
-    private Integer totalMrpPrice;
+    private Double totalMrpPrice;
     private Integer discount;
     private String couponCode;
 }

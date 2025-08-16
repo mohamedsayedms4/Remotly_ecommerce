@@ -88,7 +88,7 @@ public class ProjectSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
 
 //                        .requestMatchers("/sellers/profile").hasRole("ADMIN")
-                        .requestMatchers("/sellers/signup","sellers/login","/sellers/search","/products/seller/**").permitAll()
+                        .requestMatchers("/sellers/signup","sellers/login","/sellers/search","/products/seller/**","/products/id","/products/search","/products/category/**","/categories/**").permitAll()
                         .requestMatchers("/api/**","/myAccount","/sellers/**","products/insert").authenticated()
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/loginWithOtp", "/auth/verifyOtp").permitAll()
 

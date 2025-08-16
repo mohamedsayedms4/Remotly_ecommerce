@@ -1,6 +1,8 @@
 package org.example.remotly_ecommerce.service;
 
-import org.example.remotly_ecommerce.dto.ProductDto;
+import org.example.remotly_ecommerce.dto.product.BaseProductUploadRecord;
+import org.example.remotly_ecommerce.dto.product.ProductRecord;
+import org.example.remotly_ecommerce.dto.product.ProductResponseDto;
 import org.example.remotly_ecommerce.exception.ProductException;
 import org.example.remotly_ecommerce.exception.SellerException;
 import org.example.remotly_ecommerce.model.Product;
@@ -12,30 +14,22 @@ import java.util.Optional;
 
 public interface ProductService {
 
-     Optional<Product> createProduct(ProductDto productDto , Seller seller );
+     Optional<Product> createProduct(BaseProductUploadRecord productDto , Seller seller );
 
-     Optional<Product> updateProduct(ProductDto productDto);
+     Optional<Product> updateProduct(Long id ,ProductRecord productDto);
 
-     void deleteProduct(ProductDto productDto );
+     void deleteProduct(ProductRecord productDto );
 
-     List<ProductDto> searchProducts();
+     List<ProductRecord> searchProducts();
+     Optional<ProductResponseDto> getProductById(Long id) throws ProductException;
+     Page<Product> getAllProducts(Long category, String brand, String colors, String sizes,
+                                  Integer minPrice, Integer maxPrice, Integer minDiscount,
+                                  String stock, String sort, Integer pageNumber);
 
-     public Page<Product> getAllProducts(
-             String category ,
-             String brand ,
-             String colors ,
-             String sizes ,
-             Integer minPrice ,
-             Integer maxPrice ,
-             Integer minDiscount ,
-             String stock ,
-             String sort ,
-             Integer pageNumber
+     List<ProductRecord> getProductsBySellerId(Long sellerId) throws SellerException , ProductException;
 
-     );
-
-     List<ProductDto> getProductsBySellerId(Long sellerId) throws SellerException , ProductException;
+      Page<ProductResponseDto> getProductsByCategory(Long categoryId, Integer pageNumber, Integer pageSize) ;
 
 
 
-}
+     }
