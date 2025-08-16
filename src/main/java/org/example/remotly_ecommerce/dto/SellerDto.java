@@ -5,7 +5,7 @@ import org.example.remotly_ecommerce.model.BusinessDetails;
 
 public record SellerDto(
         Long id,
-        String email,
+        String customerEmail,
         String fullName,
         String phoneNumber,
         String sellerName,

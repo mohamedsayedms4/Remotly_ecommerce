@@ -1,6 +1,7 @@
 package org.example.remotly_ecommerce.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,13 +11,15 @@ import org.example.remotly_ecommerce.dto.SellerDto;
 import org.example.remotly_ecommerce.exception.SellerException;
 import org.example.remotly_ecommerce.model.Seller;
 import org.example.remotly_ecommerce.response.AuthResponse;
-import org.example.remotly_ecommerce.response.LoginRequest;
-import org.example.remotly_ecommerce.response.SignUpRequest;
+import org.example.remotly_ecommerce.dto.user.LoginRequest;
+import org.example.remotly_ecommerce.dto.user.SignUpRequest;
 import org.example.remotly_ecommerce.service.SellerService;
+import org.example.remotly_ecommerce.utilis.ImageUploadUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -28,17 +31,43 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SellerController {
     private final SellerService sellerService;
-    @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> createUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        String jwt = sellerService.createSeller(signUpRequest)
-                .orElseThrow(() -> new RuntimeException("Failed to create seller"));
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setJwt(jwt);
-        authResponse.setMessage("User created successfully");
-        authResponse.setUserRole(UserRole.ROLE_SELLER);
+    private final ImageUploadUtil imageUploadUtil;
 
-        return ResponseEntity.ok(authResponse);
-    }
+
+
+//
+//    @PostMapping("/signup")
+//    public ResponseEntity<AuthResponse> createUser(
+//            @Valid @RequestPart("seller_details") String sellerDetails,
+//            @RequestPart(value = "image", required = false) MultipartFile image)throws Exception {
+//
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        SignUpRequest signUpRequest = objectMapper.readValue(sellerDetails, SignUpRequest.class);
+//        // معالجة الصورة إذا كانت موجودة
+//        String imageUrl = null;
+//        if (image != null && !image.isEmpty()) {
+//            imageUrl = imageUploadUtil.saveImage(image);
+//        }
+//
+//
+//        // إنشاء request جديد مع URL الصورة
+//        SignUpRequest finalRequest = new SignUpRequest(
+//                signUpRequest.customerEmail(),
+//                signUpRequest.customerFullName(),
+//                signUpRequest.customerPhoneNumber(),
+//                imageUrl,
+//                signUpRequest.customerPassword()
+//        );
+//
+//        String jwt = sellerService.createSeller(finalRequest)
+//                .orElseThrow(() -> new RuntimeException("Failed to create seller"));
+//        AuthResponse authResponse = new AuthResponse();
+//        authResponse.setJwt(jwt);
+//        authResponse.setMessage("User created successfully");
+//        authResponse.setUserRole(UserRole.ROLE_SELLER);
+//
+//        return ResponseEntity.ok(authResponse);
+//    }
     @PostMapping("/login")
     public ResponseEntity<Void> login(@RequestBody LoginRequest request) {
         String token = sellerService.login(request).orElseThrow(() -> new RuntimeException("Failed to login"));
@@ -95,7 +124,7 @@ public class SellerController {
     }
     @GetMapping("/profile/email")
     public ResponseEntity<?> getSellerByEmail(@RequestParam String email) throws SellerException {
-        log.info("Received request to search seller with email: {}", email);
+        log.info("Received request to search seller with customerEmail: {}", email);
 
         Optional<Seller> seller = sellerService.getSellerByEmail(email);
 
@@ -103,7 +132,7 @@ public class SellerController {
             log.debug("Seller found: {}", seller.get());
             return ResponseEntity.ok(seller.get());
         } else {
-            log.error("Seller not found for email: {}", email);
+            log.error("Seller not found for customerEmail: {}", email);
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(Map.of("error", "Seller not found"));
         }
@@ -186,6 +215,42 @@ public class SellerController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No sellers found");
         }
         return ResponseEntity.ok(sellers);
+    }
+
+    @PostMapping("/signup")
+    public ResponseEntity<AuthResponse> createUser(
+            @RequestPart("seller_details") String userDetailsJson,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+
+        // تحويل JSON string إلى SignUpRequest object
+        ObjectMapper objectMapper = new ObjectMapper();
+        SignUpRequest signUpRequest = objectMapper.readValue(userDetailsJson, SignUpRequest.class);
+
+        // معالجة الصورة إذا كانت موجودة
+        String imageUrl = null;
+        if (image != null && !image.isEmpty()) {
+            imageUrl = imageUploadUtil.saveImage(image);
+        }
+
+        // إنشاء request جديد مع URL الصورة
+        SignUpRequest finalRequest = new SignUpRequest(
+                signUpRequest.customerEmail(),
+                signUpRequest.customerFullName(),
+                signUpRequest.customerPhoneNumber(),
+                imageUrl,
+                signUpRequest.customerPassword()
+        );
+
+        // استدعاء الـ service باستخدام الـ request الجديد
+        String jwt = sellerService.createSeller(finalRequest)
+                .orElseThrow(() -> new RuntimeException("Failed to create customer"));
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setJwt(jwt);
+        authResponse.setMessage("User created successfully");
+        authResponse.setUserRole(UserRole.ROLE_SELLER);
+
+        return ResponseEntity.ok(authResponse);
     }
 
 }

@@ -4,7 +4,7 @@ package org.example.remotly_ecommerce.response;
 import lombok.Data;
 
 /**
- * Represents a sign-up request payload containing the user's email, full name, and one-time password (OTP).
+ * Represents a sign-up request payload containing the user's customerEmail, full name, and one-time password (OTP).
  * This class is typically used in user or seller registration with OTP verification.
  *
  * Example usage:
@@ -24,7 +24,7 @@ import lombok.Data;
 public class SignUpRequest {
 
     /**
-     * The email address provided by the new user.
+     * The customerEmail address provided by the new user.
      */
     private String email;
 
@@ -34,7 +34,7 @@ public class SignUpRequest {
     private String fullName;
 
     /**
-     * The one-time password sent to the user's email for sign-up verification.
+     * The one-time password sent to the user's customerEmail for sign-up verification.
      */
     private String password;
 

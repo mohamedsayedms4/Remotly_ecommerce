@@ -67,4 +67,18 @@ public class ImageUploadUtil {
 
         return imageUrls;
     }
+    /**
+     * Save a single image to Cloudinary and return its URL.
+     *
+     * @param image MultipartFile representing the image
+     * @return URL of the uploaded image
+     */
+    public String saveImage(MultipartFile image) {
+        if (image == null || image.isEmpty()) {
+            return null; // لو مفيش صورة، نرجع null
+        }
+        // نعيد أول عنصر من القائمة اللي بترجعها الدالة الحالية
+        return saveImages(new MultipartFile[]{image}).get(0);
+    }
+
 }

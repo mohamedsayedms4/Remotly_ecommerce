@@ -57,6 +57,7 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL)
     private Address pickupAddress = new Address();
 
+    private String imageUrl;
     // هذا الحقل الجديد للعلاقة مع Cart:
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference

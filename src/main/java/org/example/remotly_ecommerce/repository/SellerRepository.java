@@ -15,7 +15,7 @@ import java.util.Optional;
  * Repository interface for {@link Seller} entity.
  * Provides basic CRUD operations and custom query methods.
  *
- * Includes a method to find a seller by their email address.
+ * Includes a method to find a seller by their customerEmail address.
  *
  * Example usage:
  * {@code Seller seller = sellerRepository.findByEmail("example@example.com");}
@@ -27,9 +27,9 @@ import java.util.Optional;
 public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     /**
-     * Finds a seller by their email address.
+     * Finds a seller by their customerEmail address.
      *
-     * @param email the email of the seller to search for
+     * @param email the customerEmail of the seller to search for
      * @return the Seller object if found, or null if not found
      */
     Optional<Seller> findByEmail(String email);

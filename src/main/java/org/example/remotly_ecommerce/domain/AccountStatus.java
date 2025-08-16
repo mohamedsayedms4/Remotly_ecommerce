@@ -9,7 +9,7 @@ package org.example.remotly_ecommerce.domain;
  */
 public enum AccountStatus {
 
-    /** Account is created but waiting for email or phone verification. */
+    /** Account is created but waiting for customerEmail or phone verification. */
     PENDING_VERIFICATION,
 
     /** Account is active and can use the system without restriction. */

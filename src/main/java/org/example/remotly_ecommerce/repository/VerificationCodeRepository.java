@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
  * Repository interface for {@link VerificationCode} entity.
  * Provides CRUD operations and custom queries related to verification codes.
  *
- * Includes a method to find a verification code entry by email address.
+ * Includes a method to find a verification code entry by customerEmail address.
  *
  * Example usage:
  * {@code VerificationCode code = verificationCodeRepository.findByEmail("example@example.com");}
@@ -20,9 +20,9 @@ import org.springframework.stereotype.Repository;
 public interface VerificationCodeRepository extends JpaRepository<VerificationCode, Long> {
 
     /**
-     * Finds a {@link VerificationCode} by the provided email.
+     * Finds a {@link VerificationCode} by the provided customerEmail.
      *
-     * @param email the email associated with the verification code
+     * @param email the customerEmail associated with the verification code
      * @return the VerificationCode object if found, or null if not found
      */
     VerificationCode findByEmail(String email);

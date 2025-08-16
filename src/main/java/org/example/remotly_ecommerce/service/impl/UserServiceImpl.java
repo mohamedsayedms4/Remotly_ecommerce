@@ -51,23 +51,23 @@ public class UserServiceImpl implements UserService {
 //                    .parseSignedClaims(jwt)
 //                    .getPayload();
 //
-//            String email = (String) claims.get("username");
+//            String customerEmail = (String) claims.get("username");
 //
 //             subject
-//            if (email == null || email.trim().isEmpty() || !email.contains("@")) {
-//                email = claims.getSubject();
+//            if (customerEmail == null || customerEmail.trim().isEmpty() || !customerEmail.contains("@")) {
+//                customerEmail = claims.getSubject();
 //            }
 //
-//            if (email == null || email.trim().isEmpty() || !email.contains("@") || email.equals("JWT Token")) {
-//                System.out.println("No valid email found in JWT. Subject: " + claims.getSubject() + ", Username: " + claims.get("username"));
+//            if (customerEmail == null || customerEmail.trim().isEmpty() || !customerEmail.contains("@") || customerEmail.equals("JWT Token")) {
+//                System.out.println("No valid customerEmail found in JWT. Subject: " + claims.getSubject() + ", Username: " + claims.get("username"));
 //                return Optional.empty();
 //            }
 //
-//            System.out.println("Extracted email from JWT: " + email);
+//            System.out.println("Extracted customerEmail from JWT: " + customerEmail);
 //
-//            Optional<User> user = userRepository.findByEmail(email);
+//            Optional<User> user = userRepository.findByEmail(customerEmail);
 //            if (user.isEmpty()) {
-//                System.out.println("User not found with email: " + email);
+//                System.out.println("User not found with customerEmail: " + customerEmail);
 //            } else {
 //                System.out.println("User found: " + user.get().getEmail());
 //            }

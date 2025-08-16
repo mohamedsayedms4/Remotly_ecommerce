@@ -38,7 +38,7 @@ public class JwtUtil {
         }
 
         if (email == null || email.trim().isEmpty() || !email.contains("@") || email.equals("JWT Token")) {
-            throw new IllegalArgumentException("No valid email found in JWT");
+            throw new IllegalArgumentException("No valid customerEmail found in JWT");
         }
 
         return email;

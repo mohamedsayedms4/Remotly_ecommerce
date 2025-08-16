@@ -20,7 +20,7 @@ public class BusinessDetails {
     private String businessName;
 
     /**
-     * The official email address of the business.
+     * The official customerEmail address of the business.
      */
     private String businessEmail;
 

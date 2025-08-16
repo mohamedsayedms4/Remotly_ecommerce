@@ -9,7 +9,7 @@ import org.example.remotly_ecommerce.domain.UserRole;
  * Represents a seller in the system.
  * Contains personal details, business details, bank details, and account status.
  *
- * Each seller has a unique email, a pickup address, and their own account verification status.
+ * Each seller has a unique customerEmail, a pickup address, and their own account verification status.
  *
  * @author Mohamed Sayed
  * @since 2025-07-27

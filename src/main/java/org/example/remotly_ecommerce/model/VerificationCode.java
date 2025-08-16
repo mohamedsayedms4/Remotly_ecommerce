@@ -6,9 +6,9 @@ import lombok.*;
 
 /**
  * Represents a verification code (OTP) used for verifying either a user or a seller.
- * This entity links the OTP code to an email and optionally to a user or seller entity.
+ * This entity links the OTP code to an customerEmail and optionally to a user or seller entity.
  *
- * Common use case includes verifying identity during registration or login via email-based OTP.
+ * Common use case includes verifying identity during registration or login via customerEmail-based OTP.
  *
  * @author Mohamed Sayed
  * @since 2025-07-27
@@ -34,7 +34,7 @@ public class VerificationCode {
     private String otp;
 
     /**
-     * The email address to which the OTP was sent.
+     * The customerEmail address to which the OTP was sent.
      */
     private String email;
 
