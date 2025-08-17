@@ -130,7 +130,7 @@ public class RegisterImpl implements Register {
         seller.setPhoneNumber(request.customerPhoneNumber());
         seller.setPassword(passwordEncoder.encode(request.customerPassword()));
         seller.setAccountStatus(AccountStatus.PENDING_VERIFICATION);
-        seller.setSellerName("Seller " + request.customerFullName());
+//        seller.setSellerName("Seller " + request.customerFullName());
 
         if (request.customerProfileImage() != null && !request.customerProfileImage().isEmpty()) {
             seller.setImageUrl(request.customerProfileImage());

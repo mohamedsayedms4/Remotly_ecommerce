@@ -8,7 +8,6 @@ public record SellerDto(
         String customerEmail,
         String fullName,
         String phoneNumber,
-        String sellerName,
         Boolean isEmailVerified,
         String sellerPhoneNumber,
         BusinessDetails businessDetails

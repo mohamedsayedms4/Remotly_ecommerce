@@ -5,21 +5,23 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.remotly_ecommerce.domain.AccountStatus;
 import org.example.remotly_ecommerce.domain.UserRole;
+import org.example.remotly_ecommerce.dto.BecomeASellerDto;
 import org.example.remotly_ecommerce.dto.SellerDto;
 import org.example.remotly_ecommerce.exception.SellerException;
+import org.example.remotly_ecommerce.helper.seller.create.service.BecomeASeller;
+import org.example.remotly_ecommerce.helper.seller.search.service.SellerSearchContext;
+import org.example.remotly_ecommerce.helper.seller.update.service.UpdateSellerAccountStatus;
+import org.example.remotly_ecommerce.helper.seller.update.service.VerifySeller;
 import org.example.remotly_ecommerce.helper.user.sign_in.LoginContext;
 import org.example.remotly_ecommerce.helper.user.sign_up.Register;
 import org.example.remotly_ecommerce.mapper.SellerMapper;
 import org.example.remotly_ecommerce.model.Seller;
 import org.example.remotly_ecommerce.model.User;
-import org.example.remotly_ecommerce.repository.CartRepository;
 import org.example.remotly_ecommerce.repository.SellerRepository;
 import org.example.remotly_ecommerce.response.AuthResponse;
 import org.example.remotly_ecommerce.dto.user.LoginRequest;
 import org.example.remotly_ecommerce.dto.user.SignUpRequest;
 import org.example.remotly_ecommerce.service.SellerService;
-import org.example.remotly_ecommerce.utilis.JwtUtil;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -53,14 +55,13 @@ import java.util.stream.Collectors;
 public class SellerServiceImpl implements SellerService {
 
     private final SellerRepository sellerRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final CartRepository cartRepository;
-    private final JwtService jwtService;
-    private final JwtUtil jwtUtil;
     private final SellerMapper sellerMapper;
     private final LoginContext loginContext;
     private final Register register;
-
+    private final SellerSearchContext sellerSearchContext;
+    private final UpdateSellerAccountStatus updateSellerAccountStatus;
+    private final VerifySeller verifySeller ;
+    private final BecomeASeller becomeASeller ;
     /**
      * Retrieves a seller profile using a JWT token.
      *
@@ -68,14 +69,9 @@ public class SellerServiceImpl implements SellerService {
      * @return an {@link Optional} containing the {@link Seller} profile if found
      */
     @Override
-    public Optional<Seller> getSellerProfile(String jwt) {
-        try {
-            String email = jwtUtil.extractEmailFromJwt(jwt);
-            return sellerRepository.findByEmail(email);
-        } catch (Exception e) {
-            log.error("Failed to extract seller from JWT: {}", e.getMessage());
-            return Optional.empty();
-        }
+    public Optional<Seller> getSellerProfile(String jwt) throws SellerException{
+            return sellerSearchContext.execute("jwtSellerStrategy", jwt);
+
     }
 
     /**
@@ -117,14 +113,8 @@ public class SellerServiceImpl implements SellerService {
      */
     @Override
     public Optional<Seller> getSellerById(Long id) throws SellerException {
-        log.info("Searching for seller with id: {}", id);
-        Optional<Seller> seller = sellerRepository.findById(id);
-        if (seller.isEmpty()) {
-            log.error("Seller not found for id: {}", id);
-            throw new SellerException("Seller not found with ID: " + id);
-        }
-        log.debug("Seller found: {}", seller);
-        return seller;
+        String strID = Long.toString(id);
+        return sellerSearchContext.execute("idSellerStrategy",strID);
     }
 
     /**
@@ -136,14 +126,7 @@ public class SellerServiceImpl implements SellerService {
      */
     @Override
     public Optional<Seller> getSellerByEmail(String email) throws SellerException {
-        log.info("Searching for seller with customerEmail: {}", email);
-        Optional<Seller> seller = sellerRepository.findByEmail(email);
-        if (seller.isEmpty()) {
-            log.error("Seller not found for customerEmail: {}", email);
-            throw new SellerException("Seller not found with customerEmail: " + email);
-        }
-        log.debug("Seller found: {}", seller);
-        return seller;
+        return sellerSearchContext.execute("emailSellerStrategy",email);
     }
 
     /**
@@ -171,16 +154,8 @@ public class SellerServiceImpl implements SellerService {
      */
     @Override
     @Transactional
-    public Optional<Seller> verifySeller(Long id, Boolean emailVerified) {
-        Optional<Seller> sellerOpt = sellerRepository.findById(id);
-        if (sellerOpt.isPresent()) {
-            Seller seller = sellerOpt.get();
-            seller.setIsEmailVerified(emailVerified);
-            Seller updatedSeller = sellerRepository.save(seller);
-            return Optional.of(updatedSeller);
-        } else {
-            throw new RuntimeException("Seller not found with id: " + id);
-        }
+    public Optional<Seller> verifySeller(Long id, Boolean emailVerified) throws SellerException {
+        return verifySeller.verifySeller(id,emailVerified);
     }
 
     /**
@@ -231,6 +206,17 @@ public class SellerServiceImpl implements SellerService {
     }
 
     /**
+     * @param id
+     * @param becomeASellerDto
+     * @return
+     * @throws SellerException
+     */
+    @Override
+    public Optional<Seller> becomeASeller(Long id, BecomeASellerDto becomeASellerDto) throws SellerException {
+        return becomeASeller.becomeASeller(id,becomeASellerDto);
+    }
+
+    /**
      * Updates the account status of a seller.
      *
      * @param id     the seller ID
@@ -239,15 +225,8 @@ public class SellerServiceImpl implements SellerService {
      */
     @Override
     @Transactional
-    public Optional<Seller> updateSellerAccountStatus(Long id, AccountStatus status) {
-        Optional<Seller> sellerOpt = sellerRepository.findById(id);
-        if (sellerOpt.isPresent()) {
-            Seller seller = sellerOpt.get();
-            seller.setAccountStatus(status);
-            sellerRepository.save(seller);
-            return Optional.of(seller);
-        }
-        return Optional.empty();
+    public Optional<Seller> updateSellerAccountStatus(Long id, AccountStatus status) throws SellerException {
+       return updateSellerAccountStatus.updateSellerAccountStatus(id,status);
     }
 
     /**

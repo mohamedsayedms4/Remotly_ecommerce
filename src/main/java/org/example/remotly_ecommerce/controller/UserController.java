@@ -55,4 +55,6 @@ public class UserController {
                     .body(Map.of("error", "JWT processing failed", "details", e.getMessage()));
         }
     }
+
+
 }

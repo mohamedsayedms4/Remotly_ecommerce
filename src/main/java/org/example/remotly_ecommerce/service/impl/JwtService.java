@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class JwtService {
 
-    @Value("${jwt.expiration:3000000}")
+    @Value("${jwt.expiration:300000000000000}")
     private long jwtExpiration;
 
     public String generateToken(User user) {

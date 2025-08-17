@@ -2,6 +2,8 @@ package org.example.remotly_ecommerce.repository;
 
 import org.example.remotly_ecommerce.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -28,4 +30,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @return the User object if found, or null if not found
      */
     Optional<User> findByEmail(String email);
+
+    @Modifying
+    @Query(value = "UPDATE users SET user_type = 'SELLER' WHERE id = ?1", nativeQuery = true)
+    void promoteUserToSeller(Long userId);
 }

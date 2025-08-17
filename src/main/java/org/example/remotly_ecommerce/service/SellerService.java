@@ -1,6 +1,7 @@
 package org.example.remotly_ecommerce.service;
 
 import org.example.remotly_ecommerce.domain.AccountStatus;
+import org.example.remotly_ecommerce.dto.BecomeASellerDto;
 import org.example.remotly_ecommerce.dto.SellerDto;
 import org.example.remotly_ecommerce.exception.SellerException;
 import org.example.remotly_ecommerce.model.Seller;
@@ -40,7 +41,7 @@ public interface SellerService {
      * @param jwt the JWT token containing seller identity
      * @return an {@link Optional} containing the {@link Seller} profile if found
      */
-    Optional<Seller> getSellerProfile(String jwt);
+    Optional<Seller> getSellerProfile(String jwt) throws SellerException;
 
     /**
      * Creates a new seller account.
@@ -91,7 +92,7 @@ public interface SellerService {
      * @param emailVerified true if the email is verified, false otherwise
      * @return an {@link Optional} containing the updated {@link Seller}
      */
-    Optional<Seller> verifySeller(Long id, Boolean emailVerified);
+    Optional<Seller> verifySeller(Long id, Boolean emailVerified) throws SellerException;
 
     /**
      * Deletes a seller entity.
@@ -107,7 +108,7 @@ public interface SellerService {
      * @param status the new {@link AccountStatus}
      * @return an {@link Optional} containing the updated {@link Seller}, or empty if not found
      */
-    Optional<Seller> updateSellerAccountStatus(Long id, AccountStatus status);
+    Optional<Seller> updateSellerAccountStatus(Long id, AccountStatus status) throws SellerException;
 
     /**
      * Checks if a given {@link User} is a seller.
@@ -146,4 +147,7 @@ public interface SellerService {
      * @return a list of {@link SellerDto} for matching sellers
      */
     List<SellerDto> getSellersByBusinessName(String businessName);
+
+
+    Optional<Seller> becomeASeller(Long id ,BecomeASellerDto  becomeASellerDto ) throws SellerException;
 }

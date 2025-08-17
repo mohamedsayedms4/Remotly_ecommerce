@@ -101,7 +101,7 @@ public ResponseEntity<?> insertProduct(
 public ResponseEntity<?> insertProduct(
         @RequestParam("product") String productJson,
         @RequestParam("images") MultipartFile[] images,
-        @RequestHeader(value = "Authorization", required = false) String jwt) {
+        @RequestHeader(value = "Authorization", required = false) String jwt)throws SellerException {
 
     try {
         ObjectMapper mapper = new ObjectMapper();
