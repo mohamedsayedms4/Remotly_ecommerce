@@ -11,7 +11,6 @@ import org.example.remotly_ecommerce.repository.CartRepository;
 import org.example.remotly_ecommerce.repository.SellerRepository;
 import org.example.remotly_ecommerce.repository.UserRepository;
 import org.example.remotly_ecommerce.service.impl.JwtService;
-import org.example.remotly_ecommerce.utilis.ImageUploadUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +49,6 @@ public class RegisterImpl implements Register {
     private final CartRepository cartRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
-    private final ImageUploadUtil imageUploadUtil;
 
     /**
      * Registers a new account (User or Seller) based on the provided request and role.

@@ -34,4 +34,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Modifying
     @Query(value = "UPDATE users SET user_type = 'SELLER' WHERE id = ?1", nativeQuery = true)
     void promoteUserToSeller(Long userId);
+
+    boolean existsByEmail(String email);
+
 }

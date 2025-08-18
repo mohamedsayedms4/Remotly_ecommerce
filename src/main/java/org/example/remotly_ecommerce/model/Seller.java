@@ -22,6 +22,7 @@ import org.example.remotly_ecommerce.domain.UserRole;
 @NoArgsConstructor
 public class Seller extends User {
 
+    private String sellerName;
 
     @Embedded
     private BusinessDetails businessDetails = new BusinessDetails();
@@ -37,5 +38,7 @@ public class Seller extends User {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus ;
 
-
+    // في حالة أن الهاتف خاص بالـ Seller فقط
+    private String sellerPhoneNumber;
+    // ممكن تحذفه من User وتضعه هنا، أو تعيد استخدام الهاتف من User
 }

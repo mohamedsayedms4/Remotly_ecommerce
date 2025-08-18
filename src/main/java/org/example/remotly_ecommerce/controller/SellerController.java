@@ -1,6 +1,8 @@
 package org.example.remotly_ecommerce.controller;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.remotly_ecommerce.domain.AccountStatus;
@@ -11,14 +13,18 @@ import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpContex
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpControllerHelper;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpStrategy;
 import org.example.remotly_ecommerce.model.Seller;
+import org.example.remotly_ecommerce.model.User;
 import org.example.remotly_ecommerce.response.AuthResponse;
 import org.example.remotly_ecommerce.dto.user.LoginRequest;
 import org.example.remotly_ecommerce.dto.user.SignUpRequest;
 import org.example.remotly_ecommerce.service.SellerService;
+import org.example.remotly_ecommerce.service.UserService;
+import org.example.remotly_ecommerce.utilis.ImageUploadUtil;
 import org.example.remotly_ecommerce.utilis.ResponseHelperUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,7 +40,8 @@ public class SellerController {
     private final SellerService sellerService;
     private final SignUpControllerHelper signUpControllerHelper;
     private final SignUpContext signUpContext;
-
+    private final ImageUploadUtil imageUploadUtil ;
+    private final UserService userService;
 
 
     /**
@@ -112,6 +119,9 @@ public class SellerController {
                     .body(Map.of("error", "JWT processing failed", "details", e.getMessage()));
         }
     }
+
+
+
     @GetMapping("/profile/byId")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getSellerById(@RequestParam Long id) throws SellerException {
@@ -119,12 +129,86 @@ public class SellerController {
         return ResponseHelperUtil.fromOptional(seller, "Seller not found");
     }
 
+    @GetMapping("/test-auth")
+    @PreAuthorize("hasAnyRole('ADMIN','CUSTOMER')")
+    public ResponseEntity<?> testAuth(@RequestHeader("Authorization") String authHeader,
+                                      HttpServletRequest request) {
+        System.out.println("Test Auth - Authorization: " + authHeader);
+        System.out.println("Test Auth - Authentication: " + SecurityContextHolder.getContext().getAuthentication());
+
+        return ResponseEntity.ok(Map.of(
+                "message", "Authentication working!",
+                "user", SecurityContextHolder.getContext().getAuthentication().getName(),
+                "authorities", SecurityContextHolder.getContext().getAuthentication().getAuthorities()
+        ));
+    }
 
 
     @GetMapping("/profile/email")
     public ResponseEntity<?> getSellerByEmail(@RequestParam String email) throws SellerException {
         Optional<Seller> seller = sellerService.getSellerByEmail(email);
         return ResponseHelperUtil.fromOptional(seller, "Seller not found");
+    }
+
+    @PostMapping("/become")
+    @PreAuthorize("hasAnyRole('ADMIN','CUSTOMER')")
+    public ResponseEntity<?> becomeASeller(
+            @RequestPart("seller_details") String dto,
+            @RequestHeader(value = "Authorization", required = false) String jwt,
+            @RequestPart(value = "logo", required = true) MultipartFile logo,
+            @RequestPart(value = "banner", required = false) MultipartFile banner) throws Exception {
+            log.info("----------JWT IS______________ : {}",jwt);
+        Optional<User> sellerOptional = userService.findByJwt(jwt);
+        if (sellerOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "User not found"));
+        }
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        BecomeASellerDto becomeASellerDto = objectMapper.readValue(dto, BecomeASellerDto.class);
+
+        // رفع الصور
+        String logoUrl = null;
+        if (logo != null && !logo.isEmpty()) {
+            logoUrl = imageUploadUtil.saveImage(logo);
+        }
+
+        String bannerUrl = null;
+        if (banner != null && !banner.isEmpty()) {
+            bannerUrl = imageUploadUtil.saveImage(banner);
+        }
+
+        // تحديث DTO بالصور
+        BecomeASellerDto updatedDto = new BecomeASellerDto(
+                becomeASellerDto.businessName(),
+                becomeASellerDto.businessEmail(),
+                becomeASellerDto.businessMobile(),
+                becomeASellerDto.businessAddress(),
+                logoUrl,
+                bannerUrl
+        );
+
+        Long userId = sellerOptional.get().getId();
+
+        try {
+            Optional<Seller> sellerOpt = sellerService.becomeASeller(userId, updatedDto);
+            if (sellerOpt.isPresent()) {
+                return ResponseEntity.ok(Map.of(
+                        "message", "User promoted to Seller successfully",
+                        "sellerId", sellerOpt.get().getId(),
+                        "accountStatus", sellerOpt.get().getAccountStatus().name()
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("error", "Could not create seller"));
+            }
+        } catch (SellerException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Internal server error"));
+        }
     }
 
 
@@ -208,36 +292,5 @@ public class SellerController {
     }
 
 
-    @PostMapping("/become")
-    @PreAuthorize("hasAnyRole('ADMIN','CUSTOMER')")
-    public ResponseEntity<?> becomeASeller(
-            @RequestParam Long userId,
-            @RequestBody BecomeASellerDto dto) {
-        log.info("SellerController: becomeASeller called with userId {} and dto {}", userId, dto);
-
-        try {
-            Optional<Seller> sellerOpt = sellerService.becomeASeller(userId, dto);
-            if (sellerOpt.isPresent()) {
-                log.info("Seller promotion successful for userId {}", userId);
-                return ResponseEntity.ok(Map.of(
-                        "message", "User promoted to Seller successfully",
-                        "sellerId", sellerOpt.get().getId(),
-                        "accountStatus", sellerOpt.get().getAccountStatus().name()
-                ));
-            } else {
-                log.warn("Seller promotion failed, seller not created for userId {}", userId);
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                        .body(Map.of("error", "Could not create seller"));
-            }
-        } catch (SellerException ex) {
-            log.error("Error in becomeASeller for userId {}: {}", userId, ex.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", ex.getMessage()));
-        } catch (Exception ex) {
-            log.error("Unexpected error in becomeASeller for userId {}: {}", userId, ex.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Internal server error"));
-        }
-    }
 
 }

@@ -9,22 +9,23 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SellerMapper {
-
     // Entity → DTO
     @Mapping(source = "id", target = "id")
-    @Mapping(source = "email", target = "customerEmail")   // Seller.email → SellerDto.customerEmail
+    @Mapping(source = "email", target = "customerEmail") // صحيح: Entity.email → DTO.customerEmail
     @Mapping(source = "fullName", target = "fullName")
     @Mapping(source = "phoneNumber", target = "phoneNumber")
     @Mapping(source = "isEmailVerified", target = "isEmailVerified")
+    @Mapping(source = "sellerPhoneNumber", target = "sellerPhoneNumber")
     @Mapping(source = "businessDetails", target = "businessDetails")
     SellerDto toDto(Seller seller);
 
     // DTO → Entity
-    @Mapping(source = "customerEmail", target = "email")   // SellerDto.customerEmail → Seller.email
+    @Mapping(source = "customerEmail", target = "email") // ← يجب أن يكون source هو DTO.customerEmail
     @Mapping(source = "id", target = "id")
     @Mapping(source = "fullName", target = "fullName")
     @Mapping(source = "phoneNumber", target = "phoneNumber")
     @Mapping(source = "isEmailVerified", target = "isEmailVerified")
+    @Mapping(source = "sellerPhoneNumber", target = "sellerPhoneNumber")
     @Mapping(source = "businessDetails", target = "businessDetails")
     Seller toEntity(SellerDto dto);
 
