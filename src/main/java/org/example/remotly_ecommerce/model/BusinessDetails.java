@@ -1,5 +1,6 @@
 package org.example.remotly_ecommerce.model;
 
+import jakarta.persistence.Column;
 import lombok.Data;
 
 /**
@@ -17,16 +18,20 @@ public class BusinessDetails {
     /**
      * The name of the business.
      */
+    @Column(unique = true)
     private String businessName;
 
     /**
      * The official customerEmail address of the business.
      */
+    @Column(unique = true)
     private String businessEmail;
 
     /**
      * The mobile phone number for the business.
      */
+    @Column(unique = true)
+
     private String businessMobile;
 
     /**

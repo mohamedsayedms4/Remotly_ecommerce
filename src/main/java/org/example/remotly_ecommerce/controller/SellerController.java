@@ -11,14 +11,11 @@ import org.example.remotly_ecommerce.dto.SellerDto;
 import org.example.remotly_ecommerce.exception.SellerException;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpContext;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpControllerHelper;
-import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpStrategy;
 import org.example.remotly_ecommerce.model.Seller;
 import org.example.remotly_ecommerce.model.User;
-import org.example.remotly_ecommerce.response.AuthResponse;
 import org.example.remotly_ecommerce.dto.user.LoginRequest;
-import org.example.remotly_ecommerce.dto.user.SignUpRequest;
 import org.example.remotly_ecommerce.service.SellerService;
-import org.example.remotly_ecommerce.service.UserService;
+import org.example.remotly_ecommerce.service.user.UserService;
 import org.example.remotly_ecommerce.utilis.ImageUploadUtil;
 import org.example.remotly_ecommerce.utilis.ResponseHelperUtil;
 import org.springframework.http.HttpStatus;
@@ -54,28 +51,28 @@ public class SellerController {
      * @return ResponseEntity containing AuthResponse with JWT, message, and user role.
      * @throws Exception if JSON parsing fails or image processing fails.
      */
-    @PostMapping("/signup")
-    public ResponseEntity<AuthResponse> createUser(
-            @RequestPart("seller_details") String userDetailsJson,
-            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
-
-        // Convert JSON string + handle optional image into SignUpRequest using the helper
-        SignUpRequest finalRequest = signUpControllerHelper.buildSignUpRequest(userDetailsJson, image);
-        log.info("finalRequest : {}", finalRequest.toString());
-
-        // Select the appropriate signup strategy using Strategy Pattern
-        SignUpStrategy strategy = signUpContext.getStrategy("sellerSignUpStrategy");
-        if (strategy == null) {
-            // Throw exception if no strategy is found
-            throw new RuntimeException("No strategy found for type");
-        }
-
-        // Execute the selected strategy to perform signup and get AuthResponse
-        AuthResponse response = strategy.signUp(finalRequest);
-
-        // Return the final response with JWT, message, and role
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping("/signup")
+//    public ResponseEntity<AuthResponse> createUser(
+//            @RequestPart("seller_details") String userDetailsJson,
+//            @RequestPart(value = "image", required = false) MultipartFile image) throws Exception {
+//
+//        // Convert JSON string + handle optional image into SignUpRequest using the helper
+//        SignUpRequest finalRequest = signUpControllerHelper.buildSignUpRequest(userDetailsJson, image);
+//        log.info("finalRequest : {}", finalRequest.toString());
+//
+//        // Select the appropriate signup strategy using Strategy Pattern
+//        SignUpStrategy strategy = signUpContext.getStrategy("sellerSignUpStrategy");
+//        if (strategy == null) {
+//            // Throw exception if no strategy is found
+//            throw new RuntimeException("No strategy found for type");
+//        }
+//
+//        // Execute the selected strategy to perform signup and get AuthResponse
+//        AuthResponse response = strategy.signUp(finalRequest);
+//
+//        // Return the final response with JWT, message, and role
+//        return ResponseEntity.ok(response);
+//    }
 
 
 
@@ -158,7 +155,7 @@ public class SellerController {
             @RequestPart(value = "logo", required = true) MultipartFile logo,
             @RequestPart(value = "banner", required = false) MultipartFile banner) throws Exception {
             log.info("----------JWT IS______________ : {}",jwt);
-        Optional<User> sellerOptional = userService.findByJwt(jwt);
+        Optional<User> sellerOptional = userService.findByJwt(jwt,User.class);
         if (sellerOptional.isEmpty()) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Map.of("error", "User not found"));

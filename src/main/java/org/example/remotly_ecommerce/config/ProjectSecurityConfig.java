@@ -93,7 +93,7 @@ public class ProjectSecurityConfig {
 
 //                        .requestMatchers("/sellers/profile").hasRole("ADMIN")
                         .requestMatchers("/sellers/signup","sellers/login","/sellers/search","/products/seller/**","/products/id","/products/search","/products/category/**","/categories/**").permitAll()
-                        .requestMatchers("/api/**","/myAccount","/sellers/**","products/insert").authenticated()
+                        .requestMatchers("/api/**","/myAccount","/sellers/**","products/insert","/users/**").authenticated()
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/loginWithOtp", "/auth/verifyOtp").permitAll()
 
         );

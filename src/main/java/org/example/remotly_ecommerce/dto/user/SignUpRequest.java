@@ -55,11 +55,6 @@ public record SignUpRequest(
         @NotBlank
         String customerPassword
 
-        /**
-         * List of roles assigned to the user.
-         * Typically contains one role like ROLE_CUSTOMER or ROLE_SELLER.
-         */
-//        List<UserRole> roles
 
 ) {
 }

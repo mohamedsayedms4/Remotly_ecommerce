@@ -1,97 +1,183 @@
 package org.example.remotly_ecommerce.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.example.remotly_ecommerce.utilis.Message;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
-import java.util.Date;
-import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * Handle all known business exceptions (custom exceptions).
-     */
+    // validation errors from @Valid
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorDetails> handleValidationExceptions(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
+
+        // جمع كل رسائل الأخطاء
+        String detailedMessage = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildErrorDetails(request, HttpStatus.BAD_REQUEST,
+                        "Validation failed", detailedMessage));
+    }
+
+    // validation errors from manual validator
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorDetails> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
+
+        // جمع كل رسائل الأخطاء من التحقق اليدوي
+        String detailedMessage = ex.getConstraintViolations()
+                .stream()
+                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .collect(Collectors.joining(", "));
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildErrorDetails(request, HttpStatus.BAD_REQUEST,
+                        "Validation failed", detailedMessage));
+    }
+
+    // known business exceptions
     @ExceptionHandler({
             UserAlreadyExistsException.class,
             InvalidEmail.class,
             InvalidPWD.class,
-            InvalidOtp.class
+            InvalidOtp.class,
+            InvalidPhoneNumber.class
     })
-    public ResponseEntity<?> handleConflictExceptions(RuntimeException ex) {
+    public ResponseEntity<ErrorDetails> handleConflictExceptions(
+            RuntimeException ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
+
         log.warn("Conflict Exception: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-                "timestamp", new Date(),
-                "status", HttpStatus.CONFLICT.value(),
-                "error", HttpStatus.CONFLICT.getReasonPhrase(),
-                "message", ex.getMessage()
-        ));
+
+        // هنا يمكنك تخصيص التفاصيل حسب نوع الاستثناء
+        String details = getConflictExceptionDetails(ex);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(buildErrorDetails(request, HttpStatus.CONFLICT, ex.getMessage(), details));
     }
 
-    /**
-     * Handle all NOT_FOUND type exceptions (Entity not found).
-     */
+    // NOT_FOUND exceptions
     @ExceptionHandler({
             SellerException.class,
             ProductException.class,
             CategoryException.class,
-
+            UserException.class
     })
-    public ResponseEntity<ErrorDetails> handleNotFoundExceptions(Exception ex,  // غير من RuntimeException إلى Exception
-                                                                 HttpServletRequest request,
-                                                                 WebRequest webRequest) {
+    public ResponseEntity<ErrorDetails> handleNotFoundExceptions(
+            Exception ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
+
         log.warn("Not Found Exception: {}", ex.getMessage());
 
-        ErrorDetails errorResponse = new ErrorDetails();
-        errorResponse.setTimestamp(LocalDateTime.now());
-        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        errorResponse.setError(HttpStatus.NOT_FOUND.getReasonPhrase());
-        errorResponse.setMessage(webRequest.getDescription(false));  // غير هذا أيضاً
-        errorResponse.setDetails(ex.getMessage());
-        errorResponse.setPath(request.getRequestURI());
+        String details = getNotFoundExceptionDetails(ex);
 
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(buildErrorDetails(request, HttpStatus.NOT_FOUND, ex.getMessage(), details));
     }
 
-    @ExceptionHandler({
-            ProductCreationException.class
+    // Bad Request exceptions
+    @ExceptionHandler(ProductCreationException.class)
+    public ResponseEntity<ErrorDetails> handleBadRequestExceptions(
+            Exception ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
 
-    })
-    public ResponseEntity<ErrorDetails> handleBadRequestExceptions(Exception ex,  // غير من RuntimeException إلى Exception
-                                                                 HttpServletRequest request,
-                                                                 WebRequest webRequest) {
-        log.warn("Not Found Exception: {}", ex.getMessage());
+        log.warn("Bad Request Exception: {}", ex.getMessage());
+        String details = getBadRequestExceptionDetails(ex);
 
-        ErrorDetails errorResponse = new ErrorDetails();
-        errorResponse.setTimestamp(LocalDateTime.now());
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorResponse.setMessage(webRequest.getDescription(false));  // غير هذا أيضاً
-        errorResponse.setDetails(ex.getMessage());
-        errorResponse.setPath(request.getRequestURI());
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(buildErrorDetails(request, HttpStatus.BAD_REQUEST, ex.getMessage(), details));
     }
 
-    /**
-     * Catch-all fallback for unexpected exceptions.
-     */
+    // fallback
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleGlobalException(Exception ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorDetails> handleGlobalException(
+            Exception ex,
+            HttpServletRequest request,
+            WebRequest webRequest) {
+
         log.error("Unexpected Exception: {}", ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
-                "timestamp", new Date(),
-                "status", HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "error", HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "message", ex.getMessage(),
-                "path", request.getRequestURI()
-        ));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(buildErrorDetails(request, HttpStatus.INTERNAL_SERVER_ERROR,
+                        "Internal server error", "An unexpected error occurred"));
+    }
+
+    // Helper method لتحديد تفاصيل استثناءات الـ Conflict
+    private String getConflictExceptionDetails(RuntimeException ex) {
+        if (ex instanceof InvalidEmail) {
+            return Message.InvalidEmail;
+        } else if (ex instanceof InvalidPWD) {
+            return Message.InvalidPWD;
+        } else if (ex instanceof InvalidOtp) {
+            return Message.InvalidOtp;
+        } else if (ex instanceof UserAlreadyExistsException) {
+            return Message.UserAlreadyExistsException;
+        }else if (ex instanceof UserException) {
+            return Message.UserException;
+        }
+        return ex.getMessage();
+    }
+
+    // Helper method لتحديد تفاصيل استثناءات الـ Not Found
+    private String getNotFoundExceptionDetails(Exception ex) {
+        if (ex instanceof SellerException) {
+            return Message.SellerException;
+        } else if (ex instanceof ProductException) {
+            return Message.ProductException;
+        } else if (ex instanceof CategoryException) {
+            return Message.CategoryException;
+        }
+        return ex.getMessage();
+    }
+
+    private String getBadRequestExceptionDetails(Exception ex) {
+        if (ex instanceof ProductCreationException) {
+            return Message.ProductCreationException;
+        }
+        return ex.getMessage();
+    }
+
+    // unified error response - النسخة الأساسية
+    private ErrorDetails buildErrorDetails(HttpServletRequest request,
+                                           HttpStatus status,
+                                           String message) {
+        return buildErrorDetails(request, status, message, message);
+    }
+
+    // unified error response - النسخة مع التفاصيل
+    private ErrorDetails buildErrorDetails(HttpServletRequest request,
+                                           HttpStatus status,
+                                           String message,
+                                           String details) {
+        ErrorDetails errorResponse = new ErrorDetails();
+        errorResponse.setTimestamp(LocalDateTime.now());
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
+        errorResponse.setMessage(message);
+        errorResponse.setDetails(details);
+        errorResponse.setPath(request.getRequestURI());
+        return errorResponse;
     }
 }

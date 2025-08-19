@@ -2,10 +2,10 @@ package org.example.remotly_ecommerce.mapper;
 
 import org.example.remotly_ecommerce.dto.user.LoginRequest;
 import org.example.remotly_ecommerce.dto.user.SignUpRequest;
+import org.example.remotly_ecommerce.dto.user.UserFullInformationDto;
 import org.example.remotly_ecommerce.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.factory.Mappers;
 import org.springframework.web.multipart.MultipartFile;
 
 @Mapper(componentModel = "spring")
@@ -53,6 +53,7 @@ public interface UserMapper {
     @Mapping(target = "password", source = "userPasswordCredentials")
     User toUser(LoginRequest request);
 
+    UserFullInformationDto toUserFullInformationDtoDto(User user);
 
 
 }

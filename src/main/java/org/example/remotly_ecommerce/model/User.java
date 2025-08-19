@@ -37,8 +37,11 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
+    @Column(unique = true)
     private String email;
     private String fullName;
+
+    @Column(unique = true)
     private String phoneNumber;
 
     @OneToMany(mappedBy = "customer", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)

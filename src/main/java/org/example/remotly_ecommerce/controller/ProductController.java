@@ -32,70 +32,7 @@ public class ProductController {
     private final ProductService productService;
     private final SellerService sellerService;
 
-//    @PostMapping("/insert")
-//    @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-//    public ResponseEntity<?> insertProduct(
-//            @RequestBody ProductRecord req,
-//            @RequestHeader(value = "Authorization", required = false) String jwt) {
-//
-//        log.info("Received request to insert product: {}", req.base().title());
-//
-//        Seller seller = sellerService.getSellerProfile(jwt)
-//                .orElseThrow(() -> {
-//                    log.error("Unauthorized or seller not found for JWT: {}", jwt);
-//                    return new RuntimeException("Seller not found or unauthorized");
-//                });
-//
-//        log.info("Seller found: {} (ID: {})", seller.getSellerName(), seller.getId());
-//        Product product = productService.createProduct(req, seller)
-//                .orElseThrow(() -> {
-//                    log.error("Failed to create product for seller ID: {}", seller.getId());
-//                    return new RuntimeException("Failed to create product");
-//                });
-//
-//        log.info("Product created successfully: {} (ID: {})", product.getTitle(), product.getId());
-//
-//        return ResponseEntity.ok(product);
-//    }
-    /*
-@PostMapping(value = "/insert",
-        consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-@PreAuthorize("hasAnyRole('ADMIN','SELLER')")
-public ResponseEntity<?> insertProduct(
-        @RequestPart(value = "product", required = true) BaseProductUploadRecord req,
-        @RequestPart(value = "images", required = true) MultipartFile[] images,
-        @RequestHeader(value = "Authorization", required = false) String jwt) {
 
-    log.info("Received request to insert product: {}", req.title());
-
-    Seller seller = sellerService.getSellerProfile(jwt)
-            .orElseThrow(() -> new RuntimeException("Seller not found or unauthorized"));
-
-    log.info("Seller found: {} (ID: {})", seller.getSellerName(), seller.getId());
-
-    // دمج الصور مع الـ record
-    BaseProductUploadRecord productWithImages = new BaseProductUploadRecord(
-            req.title(),
-            req.description(),
-            req.mrpPrice(),
-            req.sellingPrice(),
-            req.discountPercentage(),
-            images,
-            req.size(),
-            req.color(),
-            req.categoryId()
-    );
-
-    Product product = productService.createProduct(productWithImages, seller)
-            .orElseThrow(() -> new RuntimeException("Product not found with id: " + productWithImages));
-
-    log.info("Product created successfully: {} (ID: {})", product.getTitle(), product.getId());
-
-    return ResponseEntity.ok(product);
-}
-
-
-*/
 @PostMapping(value = "/insert")
 @PreAuthorize("hasAnyRole('ADMIN','SELLER')")
 public ResponseEntity<?> insertProduct(
