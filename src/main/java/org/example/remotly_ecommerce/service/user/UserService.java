@@ -12,13 +12,10 @@ import java.util.Optional;
 
 public interface UserService {
 
-//    Optional<UserFullInformationDto> findByEmail(String email);
-//    Optional<UserFullInformationDto> findById(String id);
     <T> Optional<T> findByEmail(String email, Class<T> returnType);
     <T> Optional<T> findById(String id, Class<T> returnType);
     <T> Optional<T> findByJwt(String jwt, Class<T> returnType);    Optional<UserFullInformationDto> findByPhoneNumber(String phoneNumber);
     Optional<UserUpdateDto> updateUser(UserUpdateDto user , String email) ;
-//    Optional<UserFullInformationDto> findById(Long id);
     Optional<UserUpdateProfileImageDto> updateProfileImage(String imageUrl , String email) throws InvalidEmail;
     void deleteUser(Long id);
 

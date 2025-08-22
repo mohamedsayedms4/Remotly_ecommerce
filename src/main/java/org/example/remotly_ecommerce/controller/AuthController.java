@@ -1,11 +1,9 @@
 package org.example.remotly_ecommerce.controller;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.remotly_ecommerce.domain.UserRole;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpContext;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpControllerHelper;
 import org.example.remotly_ecommerce.helper.user.sign_up.controller.SignUpStrategy;
@@ -14,13 +12,10 @@ import org.example.remotly_ecommerce.dto.user.LoginRequest;
 import org.example.remotly_ecommerce.response.OtpVerificationRequest;
 import org.example.remotly_ecommerce.dto.user.SignUpRequest;
 import org.example.remotly_ecommerce.service.AuthService;
-import org.example.remotly_ecommerce.utilis.ImageUploadUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 @RestController

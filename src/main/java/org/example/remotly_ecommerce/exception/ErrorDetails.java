@@ -18,6 +18,5 @@ public class ErrorDetails {
     private int status;
     private String error;
     private String message;
-    private String details; // الحقل الجديد للتفاصيل
     private String path;
 }

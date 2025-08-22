@@ -22,15 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id
      * @return
      */
-//    @Override
-//    public Optional<Category> findById(Long id) throws CategoryException {
-//        log.debug("Finding category by ID: {}", id);
-//        Category category = categoryRepository.findById(id)
-//                .orElseThrow(() -> {
-//                    throw new CategoryException("Category Not Found with ID: " + id)
-//                });
-//        return Optional.of(category);
-//    }
+
     @Override
     public Optional<Category> findById(Long id) throws CategoryException {
         log.debug("Finding category by ID: {}", id);
@@ -71,7 +63,6 @@ public class CategoryServiceImpl implements CategoryService {
             throw new CategoryException("Category already exists with name: " + category.getName());
         }
 
-        // حفظ الكاتيجوري الجديدة
         Category savedCategory = categoryRepository.save(category);
         return savedCategory;
     }

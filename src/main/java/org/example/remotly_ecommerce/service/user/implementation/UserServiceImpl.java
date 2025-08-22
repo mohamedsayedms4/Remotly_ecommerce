@@ -17,6 +17,8 @@ import org.example.remotly_ecommerce.service.user.UserService;
 import org.example.remotly_ecommerce.service.user.helper.search.service.UserSearchContext;
 import org.example.remotly_ecommerce.utilis.JwtUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -33,6 +35,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final UserSearchContext  userSearchContext;
     private final PasswordEncoder passwordEncoder;
+    private final MessageSource messageSource;
 
     @Value("${" + ApplicationConstants.JWT_SECRET_KEY + ":" + ApplicationConstants.JWT_SECRET_DEFAULT_VALUE + "}")
     private String jwtSecret;
@@ -86,11 +89,11 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userRepository.findByEmail(dto.email()).isPresent()) {
-            throw new InvalidEmail("User with email [" + dto.email() + "] already exists");
+            throw new InvalidEmail(messageSource.getMessage("user.email.already.exists",new Object[]{dto.email()}, LocaleContextHolder.getLocale()));
         }
 
         if (userRepository.existsByPhoneNumber(dto.phoneNumber())) {
-            throw new InvalidPhoneNumber("User with phone number [" + dto.phoneNumber() + "] already exists");
+            throw new InvalidPhoneNumber(messageSource.getMessage("user.phone.already.exists",new Object[]{dto.phoneNumber()}, LocaleContextHolder.getLocale()));
         }
 
 
@@ -167,7 +170,7 @@ public class UserServiceImpl implements UserService {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             log.error("User not found with id: {}", id);
-            throw new UserException("User not found with id: " + id);
+            throw new UserException(messageSource.getMessage("user.not.found", new Object[]{id}, LocaleContextHolder.getLocale()));
         }
 
         userRepository.deleteById(id);
@@ -208,15 +211,14 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Boolean updatePassword(ChangeUserPWD userDto) {
         User user = userRepository.findByEmail(userDto.email()).
-                orElseThrow(()-> new UserException("User with email [" + userDto.email() + "] not found"));
+                orElseThrow(()-> new UserException(messageSource.getMessage("user.not.found", new Object[]{userDto.email()}, LocaleContextHolder.getLocale())));
 
         if(!passwordEncoder.matches(userDto.password(), user.getPassword())) {
-            throw new UserException("Old password is incorrect");
+            throw new UserException(messageSource.getMessage("user.password.invalid",null,LocaleContextHolder.getLocale()));
         }
         String newPassword = userDto.newPassword();
 
         String encodedPassword = passwordEncoder.encode(newPassword);
-        // 5- تحديث الباسورد
         user.setPassword(encodedPassword);
         userRepository.save(user);
 

@@ -5,13 +5,13 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record ChangeUserPWD(
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid customerEmail format")
+        @NotBlank(message = "{email.invalid.blank.input.from.user}")
+        @Email(message = "{email.invalid.format.input.from.user}")
         String email,
-        @NotBlank(message = "old Password is required")
+        @NotBlank(message = "{old.password.required}")
         String password ,
-        @NotBlank(message = "New password is required")
-        @Size(min = 8, message = "New password must be at least 8 characters")
+        @NotBlank(message = "{new.password.required}")
+        @Size(min = 8, message = "{new.password.size}")
         String newPassword
 ) {
 }

@@ -8,15 +8,15 @@ import org.example.remotly_ecommerce.model.Address;
 
 
 public record UserUpdateDto(
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid customerEmail format")
+        @NotBlank(message = "{email.invalid.blank.input.from.user}")
+        @Email(message = "{email.invalid.format.input.from.user}")
         String email ,
-        @NotBlank(message = "Full name is required")
-        @Size(min = 3, max = 50, message = "Full name must be between 3 and 50 characters")
+        @NotBlank(message = "{fullName.required}")
+        @Size(min = 3, max = 50, message = "{fullName.size}")
         String fullName,
         Address pickupAddress,
-        @NotBlank(message = "Phone number is required")
-        @Pattern(regexp = "^(\\+20|0)?1[0-9]{9}$", message = "Invalid Egyptian phone number")
+        @NotBlank(message = "{phone.required}")
+        @Pattern(regexp = "^(\\+20|0)?1[0-9]{9}$", message = "{phone.invalid}")
         String phoneNumber
 ) {
 }

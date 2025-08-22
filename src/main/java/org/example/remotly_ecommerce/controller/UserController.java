@@ -1,5 +1,6 @@
 package org.example.remotly_ecommerce.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -20,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,11 +41,11 @@ public class UserController {
     private final ImageUploadUtil imageUploadUtil;
     @GetMapping("profile/email")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<?> getUserProfileByEmail(@Email @NotBlank(message = "Email cannot be blank")
-                                                        @Pattern(
-                                                                regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$",
-                                                                message = "Email format is invalid"
-                                                        ) @RequestParam String email) {
+    public ResponseEntity<?> getUserProfileByEmail( @RequestParam
+                                                        @NotBlank(message = "{email.invalid.blank.input.from.user}")   // لو الايميل فاضي
+                                                        @Email(message = "{email.invalid.format.input.from.user}")     // لو الايميل مش صحيح
+                                                        String email)
+                                                         {
         Optional<UserFullInformationDto> user = userService.findByEmail(email, UserFullInformationDto.class);
         if (user.isPresent()) {
             return new ResponseEntity<>(user.get(), HttpStatus.OK);
@@ -136,7 +138,6 @@ public class UserController {
 
     @PutMapping("/image")
     public ResponseEntity<?> updateImageUrl(
-//            @NotBlank(message = "Image is required")
             @RequestPart(value = "imageProfile", required = true) MultipartFile imageProfile,
             @RequestHeader(value = "Authorization", required = false) String jwt
     ){
@@ -223,5 +224,6 @@ public class UserController {
 //    public ResponseEntity<?> getUserProfileById(@RequestParam String id) {
 //
 //    }
+
 
 }

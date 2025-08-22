@@ -61,6 +61,7 @@ public class ProjectSecurityConfig {
     @Order
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
                 .cors(corsConfig -> corsConfig.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(Collections.singletonList("http://127.0.0.1:5500")); // origin واضح
@@ -77,7 +78,7 @@ public class ProjectSecurityConfig {
 
                 .csrf(csrfConfig -> csrfConfig.disable())
 //                .csrf(csrfConfig -> csrfConfig
-//                        .ignoringRequestMatchers("/auth/signup","/auth/login","/auth/loginWithOtp","/auth/verifyOtp")
+//                        .ignoringRequestMatchers("/auth/login")
 //                        .csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
 //                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 //                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
@@ -92,6 +93,7 @@ public class ProjectSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
 
 //                        .requestMatchers("/sellers/profile").hasRole("ADMIN")
+                                .requestMatchers("/csrf-token").permitAll()
                         .requestMatchers("/sellers/signup","sellers/login","/sellers/search","/products/seller/**","/products/id","/products/search","/products/category/**","/categories/**").permitAll()
                         .requestMatchers("/api/**","/myAccount","/sellers/**","products/insert","/users/**").authenticated()
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/loginWithOtp", "/auth/verifyOtp").permitAll()
